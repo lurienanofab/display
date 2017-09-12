@@ -158,7 +158,6 @@
     <Compile Include="Controllers\AjaxController.cs" />
     <Compile Include="Controllers\AjaxErrorHandler.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="HelperExtensions.cs" />
     <Compile Include="Models\AdminModel.cs" />
     <Compile Include="Models\Box\BoxObject.cs" />
     <Compile Include="Models\Box\FolderEntry.cs" />

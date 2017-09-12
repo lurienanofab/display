@@ -7,6 +7,13 @@
 
 @section scripts{
     <script>
+        $(document).on("keydown", function (e) {
+            if (e.keyCode == 65) // when 'a' is pressed go to admin page
+                window.location = '@Url.Action("Admin", new { id })';
+            else if (e.keyCode == 82) // when 'r' is pressed refresh
+                window.location.reload(true);
+        });
+
         $(".display").display({ interval: 10000 });
     </script>
 }

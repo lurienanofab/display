@@ -1,0 +1,11 @@
+﻿.display {
+    cursor: none;
+}
+
+    .display .error {
+        background-color: #ff0000;
+        color: #fff;
+        padding: 5px;
+        font-family: 'Courier New';
+        font-weight: bold;
+    }

@@ -1,0 +1,81 @@
+﻿@using Display.Models;
+@model AdminModel
+@{
+    ViewBag.Title = "Admin";
+    string idstr = Model.ID == 0 ? string.Empty : Model.ID.ToString();
+}
+
+@section styles{
+    <link href="//ssel-apps.eecs.umich.edu/static/scripts/bootstrap/bootstrap-file/bootstrap-file.css" rel="stylesheet" />
+}
+
+<div class="container">
+    <div class="page-header">
+        <h1>Display Administration</h1>
+    </div>
+
+    @using (Html.BeginForm("Home", "Admin", FormMethod.Get, new { @class = "form-inline" }))
+    {
+        <div class="form-group">
+            <label for="id">ID:</label>
+            <input type="text" name="id" id="id" class="form-control" style="width: 100px;" value="@idstr" />
+        </div>
+        <button type="submit" class="btn btn-default">OK</button>
+    }
+
+    <hr />
+
+    <div class="row">
+        <div class="col-sm-6">
+            @if (Model.ID > 0)
+            {
+                <div style="margin-bottom: 20px;">
+                    @using (Html.BeginForm("ImageUpload", "Home", new { displayId = Model.ID }, FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-inline" }))
+                    {
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-btn">
+                                    <span class="btn btn-primary btn-file">
+                                        Browse&hellip; <input type="file" name="slide" id="slide" class="bootstrap-file" style="display: none;" multiple />
+                                    </span>
+                                </label>
+                                <input type="text" class="form-control" readonly />
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-default">Upload</button>
+                    }
+                </div>
+
+                <div>
+                    @if (Model.Files != null && Model.Files.Count() > 0)
+                    {
+                        <ul class="list-group">
+                            @foreach (var f in Model.Files.OrderBy(x => x.FileName))
+                            {
+                                <li class="list-group-item">
+                                    <div style="margin-bottom: 10px; border-bottom: solid 1px #ddd; padding-bottom: 5px; margin-bottom: 10px;">
+                                        <strong>@f.FileName</strong>
+                                        <span>(@f.Width x @f.Height)</span>
+                                        <span class="pull-right">[<a href="@Url.Action("ImageDelete", "Home", new { id = f.ID })" style="color: #ff0000;">delete</a>]</span>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <img src="@Url.Action("Image", "Home", new { id = f.ID })" style="height: 200px;" />
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <em class="text-muted">No files were found.</em>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="//ssel-apps.eecs.umich.edu/static/scripts/bootstrap/bootstrap-file/bootstrap-file.js"></script>
+}

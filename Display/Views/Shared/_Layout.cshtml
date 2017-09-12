@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>@ViewBag.Title</title>
+
+    <!-- Bootstrap -->
+    <link href="@Url.GetStaticUrl("lib/bootstrap/css/bootstrap.min.css")" rel="stylesheet">
+
+    <link href="@Url.Content("~/Scripts/maximage/css/jquery.maximage.min.css")" rel="stylesheet" />
+
+    <link href="@Url.Content("~/Scripts/display/display.css")" rel="stylesheet">
+
+    @RenderSection("styles", false)
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    @RenderBody()
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="@Url.GetStaticUrl("lib/jquery/jquery.min.js")"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="@Url.GetStaticUrl("lib/bootstrap/js/bootstrap.min.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/maximage/js/jquery.cycle.all.js")"></script>
+    <script src="@Url.Content("~/Scripts/maximage/js/jquery.easing.1.3.js")"></script>
+    <script src="@Url.Content("~/Scripts/maximage/js/jquery.maximage.min.js")"></script>
+
+    <script src="//ssel-apps.eecs.umich.edu/static/lib/moment/moment.min.js"></script>
+
+    <script src="@Url.Content("~/Scripts/display/display.js")"></script>
+
+    @RenderSection("scripts", false)
+</body>
+</html>

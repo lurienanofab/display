@@ -1,0 +1,12 @@
+﻿@{
+    int id = ViewBag.ID;
+    ViewBag.Title = string.Format("Display #{0}", id);
+}
+
+<div class="display" data-id="@id" data-url="@Url.Action("Index", "Ajax")"></div>
+
+@section scripts{
+    <script>
+        $(".display").display({ interval: 10000 });
+    </script>
+}

@@ -21,7 +21,7 @@ namespace Display.Controllers
                     {
                         var display = await GetDisplay(id);
                         var files = await GetFiles(id);
-                        return Json(new { lastUpdate = display.LastUpdateUTC.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fffzzz"), images = files.Select(x => Url.Action("Image", "Home", new { id = x.ID })) }, JsonRequestBehavior.AllowGet);
+                        return Json(new { lastUpdate = display.LastUpdateUTC.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fffzzz"), images = files.OrderBy(x => x.FileName).Select(x => Url.Action("Image", "Home", new { id = x.ID })) }, JsonRequestBehavior.AllowGet);
                     }
                     else
                         throw new HttpException(400, "Invalid value for parameter: id");

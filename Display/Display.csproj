@@ -183,7 +183,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Home\Auth.cshtml" />
     <None Include="Properties\PublishProfiles\Production %28Apps%29.pubxml" />
     <Content Include="Views\Home\Admin.cshtml" />
     <None Include="Web.Debug.config">

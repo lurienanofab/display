@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Display.Models
 {
-    public class DisplayRepository : RepositoryBase<BsonDocument>
+    public class DisplayRepository : RepositoryBase<DisplayModel>
     {
         private static readonly DisplayRepository _current;
 
@@ -29,41 +28,78 @@ namespace Display.Models
             get { return "display"; }
         }
 
-        public async Task<DisplayModel> GetDisplay(int displayId)
+        public async Task<IEnumerable<DisplayModel>> GetDisplays()
         {
-            var filter = Builders<BsonDocument>.Filter.Eq(x => x["DisplayID"], displayId);
-            var bdoc = await GetCollection().Find(filter).FirstOrDefaultAsync();
-
-            if (bdoc != null)
-            {
-                return new DisplayModel()
-                {
-                    DisplayID = bdoc["DisplayID"].AsInt32,
-                    LastUpdateUTC = bdoc["LastUpdate"].ToUniversalTime()
-                };
-            }
-            else
-            {
-                return new DisplayModel()
-                {
-                    DisplayID = displayId,
-                    LastUpdateUTC = DateTime.UtcNow
-                };
-            }
+            var builder = Builders<DisplayModel>.Filter;
+            var filter = builder.Empty;
+            var cursor = await GetCollection().FindAsync(filter);
+            var result = await cursor.ToListAsync();
+            return result;
         }
 
-        public async Task Update(int displayId)
+        public async Task<DisplayModel> GetDisplay(int displayId)
         {
-            var display = await GetDisplay(displayId);
+            var builder = Builders<DisplayModel>.Filter;
+            var filter = builder.Eq(x => x.DisplayID, displayId);
+            var cursor = await GetCollection().FindAsync(filter);
+            var display = await cursor.FirstOrDefaultAsync();
 
-            var filter = Builders<BsonDocument>.Filter
-                .Eq(x => x["DisplayID"], display.DisplayID);
+            if (display == null)
+            {
+                display = new DisplayModel()
+                {
+                    Id = ObjectId.GenerateNewId(),
+                    DisplayID = displayId,
+                    Files = new FileModel[] { },
+                    LastUpdateUTC = DateTime.UtcNow
+                };
 
-            var update = Builders<BsonDocument>.Update
-                .Set(x => x["DisplayID"], display.DisplayID)
-                .Set(x => x["LastUpdate"], DateTime.UtcNow);
+                await GetCollection().InsertOneAsync(display);
+            }
 
-            await GetCollection().UpdateOneAsync(filter, update, new UpdateOptions() { IsUpsert = true });
+            return display;
+        }
+
+        public async Task<DisplayModel> AddFile(int displayId, FileModel file)
+        {
+            var filter = Builders<DisplayModel>.Filter
+                .Where(x => x.DisplayID == displayId);
+
+            var update = Builders<DisplayModel>.Update
+                .AddToSet(x => x.Files, file)
+                .Set(x => x.LastUpdateUTC, DateTime.UtcNow);
+
+            var result = await GetCollection().FindOneAndUpdateAsync(filter, update);
+
+            return result;
+        }
+
+        public async Task<DisplayModel> RemoveFile(int displayId, ObjectId contentId)
+        {
+            var filter = Builders<DisplayModel>.Filter
+                .Where(x => x.DisplayID == displayId);
+
+            var update = Builders<DisplayModel>.Update
+                .PullFilter(x => x.Files, x => x.ContentId == contentId)
+                .Set(x => x.LastUpdateUTC, DateTime.UtcNow);
+
+            var result = await GetCollection().FindOneAndUpdateAsync(filter, update);
+
+            return result;
+        }
+
+        public async Task<DisplayModel> SetFileActive(int displayId, ObjectId contentId, bool value)
+        {
+            var filter = Builders<DisplayModel>.Filter
+                .Where(x => x.DisplayID == displayId && x.Files.Any(f => f.ContentId == contentId));
+
+            var update = Builders<DisplayModel>.Update
+                .Set(x => x.Files.ElementAt(-1).Active, value)
+                .Set(x => x.LastUpdateUTC, DateTime.UtcNow);
+
+            var result = await GetCollection().FindOneAndUpdateAsync(filter, update);
+
+            return result;
         }
     }
 }

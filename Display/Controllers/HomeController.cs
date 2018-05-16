@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Linq;
 
 namespace Display.Controllers
 {
@@ -16,60 +17,79 @@ namespace Display.Controllers
             return View();
         }
 
-        [HttpGet, Route("admin")]
-        public async Task<ActionResult> Admin(AdminModel model)
+        [HttpGet, Route("admin/{displayId?}")]
+        public async Task<ActionResult> Admin(int displayId = 0)
         {
-            model.Files = await FileRepository.Current.GetFiles(model.ID);
+            var model = await DisplayRepository.Current.GetDisplay(displayId);
             return View(model);
         }
 
-        [HttpGet, Route("image/{id}")]
-        public async Task<ActionResult> Image(string id)
+        [HttpPost, Route("admin")]
+        public ActionResult AdminRedirect(int displayId = 0)
         {
-            var objectId = ObjectId.Parse(id);
-            var file = await FileRepository.Current.GetFile(objectId);
-            var mime = MimeMapping.GetMimeMapping(file.FileName);
-            var data = file.Data;
-            return File(data, mime);
+            if (displayId == 0)
+                return RedirectToAction("Admin");
+            else
+                return RedirectToAction("Admin", new { displayId });
         }
 
-        [HttpPost, Route("image/{displayId}")]
-        public async Task<ActionResult> ImageUpload(int displayId)
+        [HttpPost, Route("admin/{displayId}/image/upload")]
+        public async Task<ActionResult> AdminImageUpload(int displayId)
         {
             int count = 0;
+
+            var display = await DisplayRepository.Current.GetDisplay(displayId);
 
             if (Request.Files.Count > 0)
             {
                 for (int i = 0; i < Request.Files.Count; i++)
                 {
-                    var file = Request.Files[i];
-                    if (file.ContentLength > 0)
+                    var postedFile = Request.Files[i];
+                    if (postedFile.ContentLength > 0)
                     {
-                        string fileName = Path.GetFileName(file.FileName);
-                        Stream source = file.InputStream;
-                        await FileRepository.Current.SaveFile(displayId, fileName, source);
+                        string fileName = Path.GetFileName(postedFile.FileName);
+                        Stream source = postedFile.InputStream;
+                        var file = await FileModel.Create(fileName, source);
+                        await DisplayRepository.Current.AddFile(displayId, file);
                         count++;
                     }
                 }
             }
 
-            if (count > 0)
-                await DisplayRepository.Current.Update(displayId);
-
-            return RedirectToAction("Admin", new { id = displayId });
+            return RedirectToAction("Admin", new { displayId });
         }
 
-        [HttpGet, Route("image/{id}/delete")]
-        public async Task<ActionResult> ImageDelete(string id)
+        [HttpGet, Route("admin/{displayId}/image/{contentId}/delete")]
+        public async Task<ActionResult> AdminImageDelete(int displayId, string contentId)
         {
-            var objectId = ObjectId.Parse(id);
-            var file = await FileRepository.Current.GetFile(objectId);
-            var deleted = await file.Delete();
+            var display = await DisplayRepository.Current.GetDisplay(displayId);
+            var objectId = ObjectId.Parse(contentId);
 
-            if (deleted)
-                await DisplayRepository.Current.Update(file.DisplayID);
+            await FileRepository.Current.DeleteFile(objectId);
+            await DisplayRepository.Current.RemoveFile(displayId, objectId);
+            
+            return RedirectToAction("Admin", new { displayId });
+        }
 
-            return RedirectToAction("Admin", new { id = file.DisplayID });
+        [HttpGet, Route("admin/{displayId}/image/{contentId}/toggle-active")]
+        public async Task<ActionResult> AdminImageToggleActive(int displayId, string contentId)
+        {
+            var display = await DisplayRepository.Current.GetDisplay(displayId);
+            var objectId = ObjectId.Parse(contentId);
+            var file = display.Files.First(x => x.ContentId == objectId);
+            await DisplayRepository.Current.SetFileActive(displayId, objectId, !file.Active);
+
+            return RedirectToAction("Admin", new { displayId });
+        }
+
+        [HttpGet, Route("image/{contentId}")]
+        public async Task<ActionResult> Image(string contentId)
+        {
+            var objectId = ObjectId.Parse(contentId);
+            var file = await FileRepository.Current.GetFileInfo(objectId);
+            var mime = MimeMapping.GetMimeMapping(file.Filename);
+            var data = await FileRepository.Current.DownloadFile(objectId);
+            return File(data, mime);
         }
     }
 }

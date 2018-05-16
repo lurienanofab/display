@@ -1,12 +1,17 @@
 ﻿@using Display.Models;
-@model AdminModel
+@model DisplayModel
 @{
     ViewBag.Title = "Admin";
-    string idstr = Model.ID == 0 ? string.Empty : Model.ID.ToString();
+    string idstr = Model.DisplayID == 0 ? string.Empty : Model.DisplayID.ToString();
 }
 
 @section styles{
     <link href="//ssel-apps.eecs.umich.edu/static/scripts/bootstrap/bootstrap-file/bootstrap-file.css" rel="stylesheet" />
+    <style>
+        .inactive{
+            background-color: #ffeeee;
+        }
+    </style>
 }
 
 <div class="container">
@@ -14,11 +19,11 @@
         <h1>Display Administration</h1>
     </div>
 
-    @using (Html.BeginForm("Home", "Admin", FormMethod.Get, new { @class = "form-inline" }))
+    @using (Html.BeginForm("AdminRedirect", "Home", FormMethod.Post, new { @class = "form-inline" }))
     {
         <div class="form-group">
             <label for="id">ID:</label>
-            <input type="text" name="id" id="id" class="form-control" style="width: 100px;" value="@idstr" />
+            <input type="text" name="displayId" id="displayId" class="form-control" style="width: 100px;" value="@idstr" />
         </div>
         <button type="submit" class="btn btn-default">OK</button>
     }
@@ -27,14 +32,14 @@
 
     <div class="row">
         <div class="col-sm-6">
-            @if (Model.ID > 0)
+            @if (!string.IsNullOrEmpty(idstr))
             {
                 <div style="margin-bottom: 20px;">
-                    @Html.ActionLink("View Display", "Index", new { id = Model.ID })
+                    @Html.ActionLink("View Display", "Index", new { id = Model.DisplayID })
                 </div>
 
                 <div style="margin-bottom: 20px;">
-                    @using (Html.BeginForm("ImageUpload", "Home", new { displayId = Model.ID }, FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-inline" }))
+                    @using (Html.BeginForm("AdminImageUpload", "Home", new { displayId = Model.DisplayID }, FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-inline" }))
                     {
                         <div class="form-group">
                             <div class="input-group">
@@ -55,16 +60,16 @@
                     @if (Model.Files != null && Model.Files.Count() > 0)
                     {
                         <ul class="list-group">
-                            @foreach (var f in Model.Files.OrderBy(x => x.FileName))
+                            @foreach (var f in Model.Files.OrderByDescending(x => x.Active).ThenBy(x => x.FileName))
                             {
-                                <li class="list-group-item">
+                                <li class="@(string.Format("list-group-item{0}", f.Active ? string.Empty : " inactive"))">
                                     <div style="margin-bottom: 10px; border-bottom: solid 1px #ddd; padding-bottom: 5px; margin-bottom: 10px;">
                                         <strong>@f.FileName</strong>
                                         <span>(@f.Width x @f.Height)</span>
-                                        <span class="pull-right">[<a href="@Url.Action("ImageDelete", "Home", new { id = f.ID })" style="color: #ff0000;">delete</a>]</span>
+                                        <span class="pull-right">[<a href="@Url.Action("AdminImageToggleActive", "Home", new { displayId = Model.DisplayID, contentId = f.ContentId.ToString() })">@(f.Active ? "disable" : "enable")</a> | <a href="@Url.Action("AdminImageDelete", "Home", new { displayId = Model.DisplayID, contentId = f.ContentId.ToString() })" style="color: #ff0000;">delete</a>]</span>
                                     </div>
                                     <div style="text-align: center;">
-                                        <img src="@Url.Action("Image", "Home", new { id = f.ID })" style="height: 200px;" />
+                                        <img src="@Url.Action("Image", "Home", new { contentId = f.ContentId.ToString() })" style="height: 200px;" />
                                     </div>
                                 </li>
                             }

@@ -1,0 +1,451 @@
+﻿@{
+    int id = ViewBag.ID;
+    ViewBag.Title = string.Format("Main Display #{0}", id);
+}
+
+@section styles{
+    <style>
+        /*.header-row {
+            height: 100px;
+            background-color: blue;
+        }
+
+        .main-row {
+            margin-left: 0;
+        }
+
+        .main-column {
+            float: left;
+        }
+
+        .left {
+            width: 70%;
+        }
+
+        .middle, .right {
+            width: 15%;
+        }
+
+        / Clear floats after the columns /
+        .main-row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .labusers {
+            background-color: #808080;
+            height: 100%;
+        }
+
+        .maximage {
+            position: relative !important;
+        }
+
+        .mc-image {
+            background-position: 0% top !important;
+            background-size: 100% !important;
+        }
+
+        .display {
+            /background-color: #ccc;/
+        }*/
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body, .viewport {
+            height: 100%;
+            width: 100%;
+        }
+
+        /*.layout {
+            height: 100%;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-row {
+            height: 10%;
+            / W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ /
+            background: linear-gradient(to right, #0d5fde, #7f9ce1);
+            background-repeat: no-repeat;
+            font-family: Verdana;
+        }
+
+        .header {
+            vertical-align: top;
+            padding-left: 5px;
+            padding-right: 5px;
+            color: #fff;
+            background: url(Images/lnf-logo-white-text-trans.png) no-repeat top right;
+            background-size: 18%;
+        }
+
+        .header-text {
+            font-size: 9vh;
+        }
+
+        .subheader-row {
+            height: 5%;
+            background-color: #0c1983;
+            color: #f1ed45;
+            font-size: 3vh;
+        }
+
+        .main-row {
+            height: 69%;
+            background: #fff;
+        }
+
+            .main-row > td {
+                vertical-align: top;
+            }
+
+        .ticker-row {
+            background: #0000ff;
+            height: 5%;
+            color: #fff;
+            font-size: 3vh;
+        }
+
+        .ticker{
+            height: 100%;
+        }*/
+
+        .vbox {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hbox {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .header {
+            height: 180px;
+            background: blue;
+            background: linear-gradient(to right, #0d5fde, #7f9ce1);
+            font-family: Verdana;
+            color: #fff;
+        }
+
+        .subheader {
+            height: 45px;
+            background-color: navy;
+            color: gold;
+            font-size: 28px;
+        }
+
+            .subheader .news {
+                flex: 1;
+            }
+
+            .subheader .users {
+                flex: 0.3;
+                text-align: center;
+            }
+
+        .main {
+            flex: 1;
+            background-color: red;
+        }
+
+            .main > .news {
+                flex: 1;
+                background-color: #fff;
+                text-align: center;
+            }
+
+            .main > .users {
+                flex: 0.3;
+                background-color: #efefef;
+                overflow: hidden;
+            }
+
+                .main > .users:last-of-type {
+                    background: #e5e5e5;
+                }
+
+                .main > .users > .item {
+                    font-size: 20px;
+                    color: #00005f;
+                    margin: 0 0 0 10px;
+                    font-family: Arial;
+                }
+
+        .footer {
+            height: 45px;
+            background: blue;
+        }
+
+        @@keyframes slide {
+            from {
+                left: 100%;
+            }
+
+            to {
+                left: -150%;
+            }
+        }
+
+        .marquee {
+            color: #fff;
+            width: 100%;
+            height: 45px;
+            line-height: 45px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .marquee-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5000px;
+            height: 45px;
+            font-size: 30px;
+            animation-name: slide;
+            animation-duration: 20s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+    </style>
+}
+
+<div class="vbox viewport">
+    <div class="header hbox">
+        <div class="vbox" style="flex: 1;">
+            <div style="font-size: 60px; margin: 0 0 0 5px;">
+                Lurie Nanofabrication Facility
+            </div>
+            <div style="font-size: 30px; margin: 0 0 0 5px;">
+                at the University of Michigan
+            </div>
+        </div>
+        <div class="vbox" style="text-align: right; margin-right: 5px;">
+            <div class="hbox" style="flex: 1; position: relative;">
+                <img src="~/Images/lnf-logo-white-text-trans.png" style="position: absolute; right: 0; opacity: 0.8; height: 110%;" />
+            </div>
+            <div class="time hbox" style="font-size: 30px;">
+            </div>
+        </div>
+    </div>
+    <div class="subheader hbox">
+        <div class="news vbox">
+            <div style="margin: 4px 0 0 4px;">
+                <div style="float: left;">LNF News</div>
+                <div style="float: right;">Users in:</div>
+            </div>
+        </div>
+        <div class="users vbox">
+            <div style="margin: 4px 0 0 0;">
+                ROBIN
+            </div>
+        </div>
+        <div class="users vbox">
+            <div style="margin: 4px 0 0 0;">
+                Clean Room
+            </div>
+        </div>
+    </div>
+    <div class="main inlab hbox" data-url="https://ssel-apps.eecs.umich.edu/data/feed/currently-in-lab/jsonp" data-jsonp="true">
+        <div class="news vbox"></div>
+        <div class="users vbox" data-area="Wet Chemistry"></div>
+        <div class="users vbox" data-area="Clean Room"></div>
+        <script class="users-template" type="text/x-handlebars-template">
+            {{#each items}}
+            <div class="item">
+                <div class="fullname">{{fullname}}</div>
+            </div>
+            {{/each}}
+        </script>
+    </div>
+    <div class="footer hbox">
+        <div class="marquee">
+            <div class="marquee-text">Remember: No chemical processing alone - use the buddy system.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&sect;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All users must return bottles and carts to their proper locations.</div>
+        </div>
+    </div>
+</div>
+
+@*<div class="layout">
+        <div class="header">
+            head
+        </div>
+        <div class="main">
+            <div class="news">
+                news
+            </div>
+            <div class="users robin">
+                users: ROBIN
+            </div>
+            <div class="users cleanroom">
+                users: Clean Room
+            </div>
+        </div>
+        <div class="footer">
+            footer
+        </div>
+    </div>*@
+
+@*<table class="layout">
+        <tbody>
+            <tr class="header-row">
+                <td colspan="3" class="header">
+                    <div class="header-text">
+                        Lurie Nanofabrication Facility
+                    </div>
+                    <div style="position: relative;">
+                        <div style="font-size: 5vh; float: left;">
+                            at the University of Michigan
+                        </div>
+                        <div style="position: absolute; bottom: 0; right: 5px; font-size: 3vh; float: right;">
+                            <span class="time"></span>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="subheader-row">
+                <td style="padding-left: 5px;">
+                    LNF News
+                    <span style="float: right;">Users in:</span>
+                </td>
+                <td style="text-align: center;">
+                    ROBIN
+                </td>
+                <td style="text-align: center;">
+                    Clean Room
+                </td>
+            </tr>
+            <tr class="main-row">
+                <td class="left" style="width: 70%;">
+                    LEFT
+                </td>
+                <td class="middle" style="width: 15%; background-color: #eeeeff;">
+                    MIDDLE
+                </td>
+                <td class="right" style="width: 15%; background-color: #ddddff;">
+                    RIGHT
+                </td>
+            </tr>
+            <tr class="ticker-row">
+                <td colspan="3" style="vertical-align: middle; padding-left: 5px; padding-right: 5px;">
+                    <div class="ticker">
+                        <ul>
+                            <li>Ticker item #1</li>
+                            <li>Ticker item #2</li>
+                            <li>Ticker item #3</li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>*@
+
+
+@*<div class="header-row">
+    </div>
+
+    <div class="main-row">
+        <div class="main-column left display" data-id="@id" data-url="@Url.Action("Index", "Ajax")"></div>
+        <div class="main-column middle labusers" data-area="cleanroom" data-url="@Url.Action("Index", "Ajax")">
+            middle
+        </div>
+        <div class="main-column right labusers" data-area="robin" data-url="@Url.Action("Index", "Ajax")">
+            right
+        </div>
+    </div>*@
+
+@section scripts{
+    <script src="https://ssel-apps.eecs.umich.edu/data/scripts/jquery.servertime.js"></script>
+    <script src="https://ssel-apps.eecs.umich.edu/static/lib/handlebars/handlebars.js"></script>
+
+    <script>
+        $.fn.inlab = function (options) {
+            return this.each(function () {
+                var $this = $(this);
+
+                var opts = $.extend({}, { "url": null, "jsonp": false, "interval": 10000, "log": false }, options, $this.data());
+
+                var source = $(".users-template", $this).html();
+                var template = Handlebars.compile(source);
+
+                var refresh = function () {
+                    var def = $.Deferred();
+
+                    if (!opts.url) {
+                        def.reject({ "error": "No URL specified." });
+                        return def.promise();
+                    }
+
+                    $.ajax({
+                        "url": opts.url,
+                        "dataType": opts.jsonp ? "jsonp" : "json"
+                    }).done(function (data) {
+
+                        if (opts.log)
+                            console.log("inlab: refreshed at " + moment().format("YYYY-MM-DD HH:mm:ss"));
+
+                        var areas = {};
+
+                        if (data && data.Data && data.Data.default) {
+                            for (x = 0; x < data.Data.default.length; x++) {
+                                var item = data.Data.default[x];
+                                var area = item.AreaName;
+
+                                if (!areas[area])
+                                    areas[area] = [];
+
+                                areas[area].push({ fullname: item.FullName })
+                            }
+                        }
+
+                        $.each(areas, function (index, value) {
+                            var target = $(".users[data-area='" + index + "']", $this);
+                            target.html(template({ items: value }));
+                        });
+
+                        def.resolve(data);
+                    }).fail(function () { def.reject({ "error": "An AJAX error occured." }); });
+
+                    return def.promise();
+                };
+
+                refresh().done(function (data) {
+                    setInterval(refresh, opts.interval);
+                });
+            });
+        }
+    </script>
+
+    <script>
+        $(document).on("keydown", function (e) {
+            if (e.keyCode == 65) // when 'a' is pressed go to admin page
+                window.location = '@Url.Action("Admin", new { id })';
+            else if (e.keyCode == 82) // when 'r' is pressed refresh
+                window.location.reload(true);
+        });
+
+        $(".display").display({
+            interval: 60000,
+            maximage: {
+                cycleOptions: {
+                    speed: 5000
+                },
+                fillElement: ".display",
+                backgroundSize: "contain"
+            }
+        });
+
+        $(".time").servertime({
+            format: "dddd, MMMM D, YYYY h:mm A",
+            url: "//ssel-sched.eecs.umich.edu/time.aspx"
+        });
+
+        $(".inlab").inlab();
+    </script>
+}

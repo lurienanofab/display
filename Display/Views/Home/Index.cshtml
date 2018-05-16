@@ -3,13 +3,13 @@
     ViewBag.Title = string.Format("Display #{0}", id);
 }
 
-<div class="display" data-id="@id" data-url="@Url.Action("Index", "Ajax")"></div>
+<div class="display" data-url="@Url.Action("GetDisplay", "Ajax", new { id, active = "true" })"></div>
 
 @section scripts{
     <script>
         $(document).on("keydown", function (e) {
             if (e.keyCode == 65) // when 'a' is pressed go to admin page
-                window.location = '@Url.Action("Admin", new { id })';
+                window.location = '@Url.Action("Admin", new { displayId = id })';
             else if (e.keyCode == 82) // when 'r' is pressed refresh
                 window.location.reload(true);
         });

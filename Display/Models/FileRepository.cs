@@ -27,55 +27,33 @@ namespace Display.Models
             get { return "display"; }
         }
 
-        public async Task<Stream> DownloadFile(ObjectId id)
+        public async Task<byte[]> DownloadFile(ObjectId id)
         {
-            MemoryStream ms = new MemoryStream();
-            await GetBucket().DownloadToStreamAsync(id, ms);
-            return ms;
-        }
-
-        public async Task<IEnumerable<FileModel>> GetFiles(int displayId)
-        {
-            var builder = Builders<GridFSFileInfo>.Filter;
-            var filter = builder.Eq(x => x.Metadata["displayId"], displayId);
-            var files = await GetBucket().Find(filter).ToListAsync();
-            var result = new List<FileModel>();
-            foreach (var f in files)
-                result.Add(await FileModel.Create(f));
+            var result = await GetBucket().DownloadAsBytesAsync(id);
             return result;
         }
 
-        public async Task<FileModel> GetFile(ObjectId id)
+        public async Task<IEnumerable<GridFSFileInfo>> GetFiles()
+        {
+            var builder = Builders<GridFSFileInfo>.Filter;
+            var filter = builder.Empty;
+            var files = await GetBucket().Find(filter).ToListAsync();
+            var result = new List<string>();
+            return files;
+        }
+
+        public async Task<GridFSFileInfo> GetFileInfo(ObjectId id)
         {
             var builder = Builders<GridFSFileInfo>.Filter;
             var filter = builder.Eq("_id", id);
             var file = await GetBucket().Find(filter).FirstOrDefaultAsync();
-            return await FileModel.Create(file);
+            return file;
         }
 
-        public async Task<ObjectId> SaveFile(int id, string fileName, Stream source)
+        public async Task<ObjectId> SaveFile(string fileName, Stream source)
         {
-            var result = await GetBucket().UploadFromStreamAsync(fileName, source, new GridFSUploadOptions()
-            {
-                Metadata = new BsonDocument { { "displayId", id } }
-            });
-
+            var result = await GetBucket().UploadFromStreamAsync(fileName, source);
             return result;
-        }
-
-        public async Task<int> DeleteFiles(int id)
-        {
-            int count = 0;
-
-            var existing = await GetFiles(id);
-
-            foreach (var item in existing.ToList())
-            {
-                bool deleted = await item.Delete();
-                count += deleted ? 1 : 0;
-            }
-
-            return count;
         }
 
         public async Task<bool> DeleteFile(ObjectId id)
@@ -83,6 +61,19 @@ namespace Display.Models
             try
             {
                 await GetBucket().DeleteAsync(id);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteAllFiles()
+        {
+            try
+            {
+                await GetBucket().DropAsync();
                 return true;
             }
             catch
